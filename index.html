@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Map Design</title>
+    <title>Lightpoles in Seattle</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.8.1/mapbox-gl.css" rel="stylesheet">
@@ -20,7 +20,6 @@
             width: 100%;
         }
 
-        /* the style of the layer control menu */
         #menu {
             background: #fff;
             position: absolute;
@@ -33,7 +32,6 @@
             font-family: 'Open Sans', sans-serif;
         }
 
-        /* each layer on the menu */
         #menu a {
             font-size: 13px;
             color: #404040;
@@ -46,12 +44,10 @@
             text-align: center;
         }
 
-        /* the last item of the layer items will not include a seperator */
         #menu a:last-child {
             border: none;
         }
 
-        /* change color and background color while a pointer is on an hybrid link. */
         #menu a:hover {
             background-color: #f8f8f8;
             color: #404040;
@@ -82,28 +78,46 @@
             center: [-122.2559435, 47.6002614] // starting center
         });
 
-        map.on('load', () => { //simplifying the function statement: arrow with brackets to define a function
+        map.on('load', () => { 
 
             map.addSource('base-tiles', {
-                'type': 'raster',
-                'tiles': [
-                    'Tiles/basemap3/{z}/{x}/{y}.png'
-                ],
-                'tileSize': 256,
-                'attribution': 'Base Map Tiles</a>'
-            });
-
-            map.addSource('newbase-tiles', {
                 'type': 'raster',
                 'tiles': [
                     'Tiles/basemap4/{z}/{x}/{y}.png'
                 ],
                 'tileSize': 256,
-                'attribution': 'another attempt at tiles'
+                'attribution': 'Base Map Tiles</a>'
+            });
+
+            map.addSource('lightpoles-tiles', {
+                'type': 'raster',
+                'tiles': [
+                    'Tiles/lightpoles-points/{z}/{x}/{y}.png'
+                ],
+                'tileSize': 256,
+                'attribution': 'Points depicting where lightpoles are in Seattle WA'
+            });
+
+            map.addSource('combined-tiles', {
+                'type': 'raster',
+                'tiles': [
+                    'Tiles/poles-base/{z}/{x}/{y}.png'
+                ],
+                'tileSize': 256,
+                'attribution': 'Points with basemap under to show where the lightpoles are'
+            });
+
+            map.addSource('themed-tiles', {
+                'type': 'raster',
+                'tiles': [
+                    'Tiles/themed-base/{z}/{x}/{y}.png'
+                ],
+                'tileSize': 256,
+                'attribution': 'A themed basemap layer which is green to show environmental conciousness'
             });
 
             map.addLayer({
-                'id': 'base',
+                'id': 'Basemap',
                 'type': 'raster',
                 'layout': {
                     'visibility': 'none'
@@ -112,34 +126,47 @@
             });
 
             map.addLayer({
-                'id': 'newBase',
+                'id': 'Lightpoles',
                 'type': 'raster',
                 'layout': {
                     'visibility': 'none'
                 },
-                'source': 'newbase-tiles'
+                'source': 'lightpoles-tiles'
+            });
+
+            map.addLayer({
+                'id': 'Combined',
+                'type': 'raster',
+                'layout': {
+                    'visibility': 'none'
+                },
+                'source': 'combined-tiles'
+            });
+
+            map.addLayer({
+                'id': 'Themed',
+                'type': 'raster',
+                'layout': {
+                    'visibility': 'none'
+                },
+                'source': 'themed-tiles'
             });
         });
 
-
-        // After the last frame rendered before the map enters an "idle" state.
         map.on('idle', () => {
             // If these two layers were not added to the map, abort
-            if (!map.getLayer('base') || !map.getLayer('newBase')) {
+            if (!map.getLayer('Basemap') || !map.getLayer('Lightpoles') || !map.getLayer('Combined') || !map.getLayer('Themed')) {
                 return;
             }
 
-            // Enumerate ids of the layers.
-            const toggleableLayerIds = ['base', 'newBase'];
+            const toggleableLayerIds = ['Basemap', 'Lightpoles', 'Combined', 'Themed'];
 
             // Set up the corresponding toggle button for each layer.
             for (const id of toggleableLayerIds) {
-                // Skip layers that already have a button set up.
                 if (document.getElementById(id)) {
                     continue;
                 }
 
-                // Create a link.
                 const link = document.createElement('a');
                 link.id = id;
                 link.href = '#';
@@ -149,13 +176,7 @@
                 // Show or hide layer when the toggle is clicked.
                 link.onclick = function (e) {
                     const clickedLayer = this.textContent;
-                    // preventDefault() tells the user agent that if the event does not get explicitly handled, 
-                    // its default action should not be taken as it normally would be.
                     e.preventDefault();
-                    // The stopPropagation() method prevents further propagation of the current event in the capturing 
-                    // and bubbling phases. It does not, however, prevent any default behaviors from occurring; 
-                    // for instance, clicks on links are still processed. If you want to stop those behaviors, 
-                    // see the preventDefault() method.
                     e.stopPropagation();
 
                     const visibility = map.getLayoutProperty(
@@ -168,7 +189,7 @@
                     if (visibility === 'visible') {
                         map.setLayoutProperty(clickedLayer, 'visibility', 'none');
                         this.className = '';
-                    } else { //otherise, it will be turned on.
+                    } else { 
                         this.className = 'active';
                         map.setLayoutProperty(
                             clickedLayer,
@@ -178,7 +199,6 @@
                     }
                 };
 
-                // in the menu place holder, insert the layer links.
                 const layers = document.getElementById('menu');
                 layers.appendChild(link);
             }
