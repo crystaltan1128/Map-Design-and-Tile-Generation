@@ -18,4 +18,4 @@ The third tile set makes up the combined basemap and point data. As seen compare
 
 The last tile set makes up a themed map. The theme of the map is tied to the environment, with green being the primary color of the map and blue to show the bodies of water. Some labels are also shown in yellow to represent the light from the lightpoles. 
 
-[Link to the Webmap]http://127.0.0.1:5500/index.html
+[Click here to view Webmap](http://127.0.0.1:5500/index.html)
